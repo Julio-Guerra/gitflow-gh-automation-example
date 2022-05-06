@@ -1,0 +1,22 @@
+on:
+  pull_request:
+    branches:
+      - 'release-*'
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          set -ev
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout v1
+          git merge --no-ff ${{ github.ref_name }}
+          [[ ${{ github.ref_name }} =~ release-v?([[:alnum:]\.\-]+) ]]
+          git tag v${BASH_REMATCH[1]}
+          git push --tags origin v1
