@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Remove the workflow label
         if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr edit --remove-label automerge
       - name: Merge the release branch
@@ -28,10 +30,10 @@ jobs:
           git fetch origin v1 main
           # Merge the PR into the main branch
           git checkout main
-          git merge --no-ff "$GITHUB_REF"
+          git merge --no-edit --no-ff "$GITHUB_REF"
           # Merge the PR into the v1 branch
           git checkout v1
-          git merge --no-ff "$GITHUB_REF"
+          git merge --no-edit --no-ff "$GITHUB_REF"
           # Get the version tag out of the release branch name and tag the merge
           # result
           [[ ${{ github.ref_name }} =~ release-v?([[:alnum:]\.\-]+) ]]
