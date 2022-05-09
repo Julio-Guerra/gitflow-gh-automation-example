@@ -3,7 +3,7 @@ name: Merge the release branch
 on:
   pull_request:
     branches:
-      - release-*
+      - v1
     types:
       - labeled
 
