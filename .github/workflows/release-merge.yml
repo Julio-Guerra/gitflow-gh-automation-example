@@ -54,8 +54,8 @@ jobs:
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: Congratulations, your release branch was successfully merged
-          and tagged as `v${{ steps.get_version.outputs.version }}`.
+          :tada: Congratulations, the release branch was successfully merged
+          and tagged with v${{ steps.get_version.outputs.version }}.
           EOF
 
       - name: Remove the workflow label
