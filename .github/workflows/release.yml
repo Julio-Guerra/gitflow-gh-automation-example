@@ -16,6 +16,7 @@ jobs:
           set -ev
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git fetch origin v1
           git checkout v1
           git merge --no-ff ${{ github.ref_name }}
           [[ ${{ github.ref_name }} =~ release-v?([[:alnum:]\.\-]+) ]]
