@@ -21,14 +21,14 @@ jobs:
           set -ex
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          # Fetch the v1 and main branches
-          git fetch origin v1 main
+          # Fetch the PR, v1 and main branches
+          git fetch origin v1 main "$GITHUB_HEAD_REF"
           # Merge the PR into the main branch
           git checkout main
-          git merge --no-edit --no-ff "$GITHUB_HEAD_REF"
+          git merge --no-edit --no-ff "origin/$GITHUB_HEAD_REF"
           # Merge the PR into the v1 branch
           git checkout v1
-          git merge --no-edit --no-ff "$GITHUB_HEAD_REF"
+          git merge --no-edit --no-ff "origin/$GITHUB_HEAD_REF"
           # Get the version tag out of the release branch name and tag the merge
           # result
           [[ ${{ github.ref_name }} =~ release-v?([[:alnum:]\.\-]+) ]]
