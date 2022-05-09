@@ -41,9 +41,14 @@ jobs:
           git checkout v1
           git merge --no-edit --no-ff "origin/$GITHUB_HEAD_REF"
 
+      - name: Tag the v1 branch merge result with ${{ steps.get_version.outputs.version }}
+        run: |
           # Get the version tag out of the release branch name and tag the merge
           # result
           git tag v${{ steps.get_version.outputs.version }}
+
+      - name: Push the branches and tag
+        run: |
           # Push the tag, v1, and main
           git push --tags origin v1 main ":$GITHUB_HEAD_REF"
 
