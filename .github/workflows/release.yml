@@ -1,4 +1,4 @@
-name: Release Workflow
+name: Merge the release branch
 
 on:
   pull_request:
@@ -6,8 +6,9 @@ on:
       - labeled
 
 jobs:
-  run_if_label_matches:
-    if: github.event.label.name == 'ci/merge-release'
+  merge_and_tag:
+    name: Merge the release branch
+    if: github.event.label.name == 'ci/release/merge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -40,5 +41,4 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr edit ${{ github.event.number }} --remove-label ci/merge-release
+        run: gh pr edit ${{ github.event.number }} --remove-label ci/release/merge
