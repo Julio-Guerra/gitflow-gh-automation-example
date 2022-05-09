@@ -2,6 +2,8 @@ name: Merge the release branch
 
 on:
   pull_request:
+    branches:
+      - v1
     types:
       - labeled
 
@@ -45,7 +47,6 @@ jobs:
         run: |
           # Push the tag, v1, and main
           git push --tags origin v1 main ":$GITHUB_HEAD_REF"
-          false
 
       - name: Remove the workflow label
         if: always()
