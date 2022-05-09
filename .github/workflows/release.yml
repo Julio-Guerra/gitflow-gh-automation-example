@@ -31,7 +31,7 @@ jobs:
           git merge --no-edit --no-ff "origin/$GITHUB_HEAD_REF"
           # Get the version tag out of the release branch name and tag the merge
           # result
-          [[ ${{ github.ref_name }} =~ release-v?([[:alnum:]\.\-]+) ]]
+          [[ "$GITHUB_HEAD_REF" =~ release-v?([[:alnum:]\.\-]+) ]]
           git tag v${BASH_REMATCH[1]}
           # Push the tag, v1, and main
           git push --tags origin v1 main
