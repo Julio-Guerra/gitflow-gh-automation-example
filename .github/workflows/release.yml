@@ -34,7 +34,7 @@ jobs:
           [[ "$GITHUB_HEAD_REF" =~ release-v?([[:alnum:]\.\-]+) ]]
           git tag v${BASH_REMATCH[1]}
           # Push the tag, v1, and main
-          git push --tags origin v1 main
+          git push --tags v1 main ":$GITHUB_HEAD_REF"
 
       - name: Remove the workflow label
         if: always()
