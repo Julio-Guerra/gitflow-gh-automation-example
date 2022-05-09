@@ -12,6 +12,8 @@ jobs:
     name: Merge the release branch
     if: github.event.label.name == 'ci/release/merge'
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
 
@@ -48,8 +50,14 @@ jobs:
           # Push the tag, v1, and main
           git push --tags origin v1 main ":$GITHUB_HEAD_REF"
 
+      - name: Add a PR comment
+        if: success()
+        run: |
+          gh pr comment ${{ github.event.number }} -F - <<EOF
+          :tada: Congratulations, your release branch was successfully merged
+          and tagged as `v${{ steps.get_version.outputs.version }}`.
+          EOF
+
       - name: Remove the workflow label
         if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr edit ${{ github.event.number }} --remove-label ci/release/merge
