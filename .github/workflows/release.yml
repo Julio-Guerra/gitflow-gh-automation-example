@@ -20,37 +20,32 @@ jobs:
           [[ "$GITHUB_HEAD_REF" =~ release-v?([[:alnum:]\.\-]+) ]]
           echo "::set-output name=version::${BASH_REMATCH[1]}"
 
-      - name: Merge the release branch
+      - name: Configure and fetch the branches
         run: |
-          #
-          # Merge the PR into the v1 and main branches and tag the resulting v1
-          # branch commit with the release version tag
-          #
-          set -ex
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           
           # Fetch the PR, v1 and main branches
           git fetch origin v1 main "$GITHUB_HEAD_REF"
-          
-          # Merge the PR into the main branch
+
+      - name: Merge the PR into the dev branch main
+        run: |
           git checkout main
           git merge --no-edit --no-ff "origin/$GITHUB_HEAD_REF"
-          
-          # Merge the PR into the v1 branch
+
+      - name: Merge the PR into the stable branch v1
+        run: |
           git checkout v1
           git merge --no-edit --no-ff "origin/$GITHUB_HEAD_REF"
 
-      - name: Tag the v1 branch merge result with ${{ steps.get_version.outputs.version }}
-        run: |
-          # Get the version tag out of the release branch name and tag the merge
-          # result
-          git tag v${{ steps.get_version.outputs.version }}
+      - name: Create the git tag v${{ steps.get_version.outputs.version }}
+        run: git tag v${{ steps.get_version.outputs.version }}
 
       - name: Push the branches and tag
         run: |
           # Push the tag, v1, and main
           git push --tags origin v1 main ":$GITHUB_HEAD_REF"
+          false
 
       - name: Remove the workflow label
         if: always()
