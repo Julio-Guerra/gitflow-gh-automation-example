@@ -29,8 +29,8 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           
-          # Fetch the PR, v1 and main branches
-          git fetch origin v1 main "$GITHUB_HEAD_REF"
+          # Fetch the tags, the PR, v1 and main branches
+          git fetch --tags origin v1 main "$GITHUB_HEAD_REF"
 
       - name: Merge the PR into the dev branch main
         run: |
