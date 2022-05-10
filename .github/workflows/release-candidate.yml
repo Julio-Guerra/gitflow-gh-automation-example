@@ -31,7 +31,7 @@ jobs:
           level: prerelease
 
       - run: |
-          echo ${{ steps.bump-semver.outputs.version }}
+          echo ${{ steps.bump-semver.outputs.new_version }}
           false
 
       - name: Configure and fetch the branches
