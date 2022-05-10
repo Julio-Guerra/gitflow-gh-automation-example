@@ -8,8 +8,8 @@ on:
       - labeled
 
 jobs:
-  merge_and_tag:
-    name: Merge the release branch
+  bump_and_tag:
+    name: Create and publish the release candidate version
     if: github.event.label.name == 'ci/release/publish-new-candidate'
     runs-on: ubuntu-latest
     env:
@@ -70,4 +70,4 @@ jobs:
 
       - name: Remove the workflow label
         if: always()
-        run: gh pr edit ${{ github.event.number }} --remove-label ci/release/merge
+        run: gh pr edit ${{ github.event.number }} --remove-label ci/release/publish-new-candidate
