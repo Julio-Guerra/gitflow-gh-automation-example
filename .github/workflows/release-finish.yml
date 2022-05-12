@@ -10,7 +10,7 @@ on:
 jobs:
   merge_and_tag:
     name: Merge the release branch
-    if: github.event.label.name == 'bot/release/merge'
+    if: github.event.label.name == 'bot/release/finish'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -31,32 +31,56 @@ jobs:
           # Fetch the tags, the PR, v1 and main branches
           git fetch --tags origin v1 main "$GITHUB_HEAD_REF"
 
+      - name: Update the version file
+        run: |
+          git checkout "$GITHUB_HEAD_REF"
+          echo ${{ steps.get_version.outputs.version }} > version
+          git add version
+          git commit -m "update version file to ${{ steps.get_version.outputs.version }}"
+
+      - name: Bump the version on the dev branch main to the next release version
+        id: bump_version
+        run: |
+          major=${{ steps.get_version.outputs.major }}
+          minor=$(( ${{ steps.get_version.outputs.minor }} + 1 ))
+          patch=${{ steps.get_version.outputs.patch }}
+          version=v$major.$minor.$patch
+          echo "::set-output name=version::$version"
+
       - name: Merge the PR into the dev branch main
         run: |
           git checkout main
           git merge --no-edit -m "Merge branch $GITHUB_HEAD_REF into main #${{ github.event.number }}" --no-ff "origin/$GITHUB_HEAD_REF"
+
+      - name: Bump the version file on the dev branch main
+        run: |
+          echo $version > version
+          git add version
+          git commit -m "bump version file to ${{ steps.bump_version.outputs.version }}"
 
       - name: Merge the PR into the stable branch v1
         run: |
           git checkout v1
           git merge --no-edit -m "Merge branch $GITHUB_HEAD_REF into v1 #${{ github.event.number }}" --no-ff "origin/$GITHUB_HEAD_REF"
 
-      - name: Create the git tag v${{ steps.get_version.outputs.version }}
-        run: git tag v${{ steps.get_version.outputs.version }}
+      - name: Create the git tag ${{ steps.get_version.outputs.version }}
+        run: git tag ${{ steps.get_version.outputs.version }}
 
       - name: Push the branches and tag
         run: |
-          # Push the tag, v1, and main
-          git push --tags origin v1 main ":$GITHUB_HEAD_REF"
+          # Push the branches
+          git push origin v1 main ":$GITHUB_HEAD_REF"
+          # Push the tag last in case the push doesn't succeed
+          git push --tags
 
       - name: Add a PR comment
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
           :tada: Congratulations, the release branch was successfully merged
-          and tagged with v${{ steps.get_version.outputs.version }}.
+          and tagged with ${{ steps.get_version.outputs.version }}.
           EOF
 
       - name: Remove the workflow label
         if: always()
-        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/merge
+        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/finish

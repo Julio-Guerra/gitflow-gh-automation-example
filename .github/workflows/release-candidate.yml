@@ -1,4 +1,4 @@
-name: Publish a new release branch
+name: Publish a new release candidate
 
 on:
   pull_request:
@@ -8,9 +8,9 @@ on:
       - labeled
 
 jobs:
-  bump_and_tag:
-    name: Create and publish the release candidate version
-    if: github.event.label.name == 'ci/release/publish-new-candidate'
+  bump_rc_and_tag:
+    name: Create and publish a new release candidate version
+    if: github.event.label.name == 'bot/release/publish-new-rc'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -21,52 +21,48 @@ jobs:
         id: get_version
         run: |
           # Get the version tag out of the release branch name
-          _tools/release/parse-version.sh "$GITHUB_HEAD_REF"
+          _tools/release/parse-version.sh "$(cat version)"
 
-      - uses: actions-ecosystem/action-bump-semver@v1
-        id: bump-semver
-        with:
-          current_version: ${{ steps.get_version.outputs.version }}
-          level: prerelease
+      - id: bump_version
+        run: |
+          major=${{ steps.get_version.outputs.major }}
+          minor=${{ steps.get_version.outputs.minor }}
+          patch=${{ steps.get_version.outputs.patch }}
+          rc=$(("${{ steps.get_version.outputs.rc }}" + 1))
+          version=v$major.$minor.$patch-rc.$rc
+          echo $version > version
+          echo "::set-output name=version::$version"
 
-      - run: |
-        echo ${{ steps.bump-semver.outputs.version }}
-        false
-
-      - name: Configure and fetch the branches
+      - name: Configure the git author and fetch the branch
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           
-          # Fetch the tags and the PR branch
+          # Fetch the tags, the PR, v1 and main branches
           git fetch --tags origin "$GITHUB_HEAD_REF"
 
-      - name: Merge the PR into the dev branch main
+      - name: Update the version file
         run: |
-          git checkout main
-          git merge --no-edit -m "Merge branch $GITHUB_HEAD_REF into main #${{ github.event.number }}" --no-ff "origin/$GITHUB_HEAD_REF"
+          git checkout "$GITHUB_HEAD_REF"
+          git add version
+          git commit -m "release candidate ${{ steps.bump_version.outputs.version }}"
 
-      - name: Merge the PR into the stable branch v1
+      - name: Create the git tag ${{ steps.bump_version.outputs.version }}
         run: |
-          git checkout v1
-          git merge --no-edit -m "Merge branch $GITHUB_HEAD_REF into v1 #${{ github.event.number }}" --no-ff "origin/$GITHUB_HEAD_REF"
+          git tag -m "${{ steps.bump_version.outputs.version }} #${{ github.event.number }}" ${{ steps.bump_version.outputs.version }}
 
-      - name: Create the git tag v${{ steps.get_version.outputs.version }}
-        run: git tag v${{ steps.get_version.outputs.version }}
-
-      - name: Push the branches and tag
+      - name: Push the branch and tag
         run: |
-          # Push the tag, v1, and main
-          git push --tags origin v1 main ":$GITHUB_HEAD_REF"
+          # Push the tag and the release branch
+          git push --tags origin "$GITHUB_HEAD_REF"
 
       - name: Add a PR comment
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: Congratulations, the release branch was successfully merged
-          and tagged with v${{ steps.get_version.outputs.version }}.
+          :tada: The release candidate tag ${{ steps.bump_version.outputs.version }} has been successfully published.
           EOF
 
       - name: Remove the workflow label
         if: always()
-        run: gh pr edit ${{ github.event.number }} --remove-label ci/release/publish-new-candidate
+        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/publish-new-rc
