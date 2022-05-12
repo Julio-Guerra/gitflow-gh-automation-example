@@ -41,7 +41,7 @@ jobs:
           # Fetch the tags, the PR, v1 and main branches
           git fetch --tags origin "$GITHUB_HEAD_REF"
 
-      - name: Commit the version file change
+      - name: Update the version file
         run: |
           git checkout "$GITHUB_HEAD_REF"
           git add version
