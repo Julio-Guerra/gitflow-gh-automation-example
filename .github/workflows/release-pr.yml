@@ -1,0 +1,32 @@
+name: Merge the release branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version of the release'
+        required: true
+
+jobs:
+  create_branch_and_pr:
+    name: Create a release pull request against v1
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure and fetch the branches
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+          # Fetch the tags, the PR, v1 and main branches
+          git fetch --tags origin v1 main "$GITHUB_HEAD_REF"
+
+      - name: Create the branch and open a PR against v1
+        run: |
+          git checkout main
+          git checkout -b release-$version
+          git push -u origin release-$version
+          gh pr create -t "Release $version" -b "" -B v1
