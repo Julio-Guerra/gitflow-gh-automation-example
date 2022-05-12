@@ -24,8 +24,8 @@ jobs:
           _tools/release/parse-version.sh "$GITHUB_HEAD_REF"
 
       - run: |
-        echo $(("${{ steps.get_version.outputs.rc }}" + 1))
-        false
+          echo $(("${{ steps.get_version.outputs.rc }}" + 1))
+          false
 
       - name: Configure and fetch the branches
         run: |
