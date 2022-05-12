@@ -43,6 +43,7 @@ jobs:
 
       - name: Commit the version file change
         run: |
+          git checkout "$GITHUB_HEAD_REF"
           git add version
           git commit -m "release candidate ${{ steps.bump_version.outputs.version }}"
 
