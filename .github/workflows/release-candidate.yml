@@ -21,7 +21,7 @@ jobs:
         id: get_version
         run: |
           # Get the version tag out of the release branch name
-          _tools/release/parse-version.sh version
+          _tools/release/parse-version.sh "$(cat version)"
 
       - id: bump_version
         run: |
