@@ -24,10 +24,11 @@ jobs:
           # Fetch the tags, the PR, v1 and main branches
           git fetch --tags origin v1 main "$GITHUB_HEAD_REF"
 
-      - name: Create the branch and open a PR against v1
-      - uses: peter-evans/create-pull-request@v4
+      - name: Create the release-${{github.event.inputs.version}} branch
         run: |
           git checkout main
-          git checkout -b release-{{github.event.inputs.version}}
+          git checkout -b release-${{github.event.inputs.version}}
           git push -u origin release-${{github.event.inputs.version}}
+
+      - name: Open a pull request from release-${{github.event.inputs.version}} to v1
           gh pr create -t "Release ${{github.event.inputs.version}}" -b "" -B v1
