@@ -48,7 +48,8 @@ jobs:
           git commit -m "release candidate ${{ steps.bump_version.outputs.version }}"
 
       - name: Create the git tag ${{ steps.bump_version.outputs.version }}
-        run: git tag ${{ steps.bump_version.outputs.version }}
+        run: |
+          git tag -m "${{ steps.bump_version.outputs.version }} #${{ github.event.number }}" ${{ steps.bump_version.outputs.version }}
 
       - name: Push the branch and tag
         run: |
@@ -59,7 +60,7 @@ jobs:
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: The release candidate tag v${{ steps.bump_version.outputs.version }} has been successfully published.
+          :tada: The release candidate tag ${{ steps.bump_version.outputs.version }} has been successfully published.
           EOF
 
       - name: Remove the workflow label
