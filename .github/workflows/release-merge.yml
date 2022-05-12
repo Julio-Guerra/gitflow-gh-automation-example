@@ -21,8 +21,7 @@ jobs:
         id: get_version
         run: |
           # Get the version tag out of the release branch name
-          [[ "$GITHUB_HEAD_REF" =~ release-v?([[:alnum:]\.\-]+) ]]
-          echo "::set-output name=version::${BASH_REMATCH[1]}"
+          _tools/release/parse-version.sh "$GITHUB_HEAD_REF"
 
       - name: Configure and fetch the branches
         run: |
