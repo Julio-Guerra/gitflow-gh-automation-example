@@ -10,7 +10,7 @@ on:
 jobs:
   merge_and_tag:
     name: Merge the release branch
-    if: github.event.label.name == 'ci/release/merge'
+    if: github.event.label.name == 'bot/release/merge'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,4 +60,4 @@ jobs:
 
       - name: Remove the workflow label
         if: always()
-        run: gh pr edit ${{ github.event.number }} --remove-label ci/release/merge
+        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/merge

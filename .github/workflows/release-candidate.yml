@@ -21,8 +21,7 @@ jobs:
         id: get_version
         run: |
           # Get the version tag out of the release branch name
-          [[ "$GITHUB_HEAD_REF" =~ release-v?([[:alnum:]\.\-]+) ]]
-          echo "::set-output name=version::v${BASH_REMATCH[1]}"
+          _tools/release/parse-version.sh "$GITHUB_HEAD_REF"
 
       - uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
