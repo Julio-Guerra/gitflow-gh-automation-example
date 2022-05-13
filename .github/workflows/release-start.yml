@@ -37,3 +37,7 @@ jobs:
       - name: Open a pull request from release-${{github.event.inputs.version}} to v1
         run: |
           gh pr create -t "Release $VERSION" -b "" -B v1 -F $GITHUB_WORKSPACE/$PR_TEMPLATE_PATH -m $VERSION -a $GITHUB_ACTOR
+
+      - name: Create a new release draft
+        run: |
+          gh release create $VERSION -t $VERSION -d --generate-notes --target v1
