@@ -40,7 +40,6 @@ jobs:
           # Two possible cases: either version.go contains a release candidate version and it will be updated back to
           # the non-release-candidate tag, either there was no release candidate and this step will exit without error.
           git checkout "$GITHUB_HEAD_REF"
-          set -x
           _tools/release/update-version-file.sh $VERSION
           if git diff-index --exit-code HEAD --; then
             echo "No change to commit"

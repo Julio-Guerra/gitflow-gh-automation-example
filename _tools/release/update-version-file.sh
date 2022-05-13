@@ -4,7 +4,7 @@
 # This script updates the version.go file with the given version string.
 #
 
-set -e
+set -ex
 source _tools/release/lib.sh
 
 # Validate the given argument is a correct version number
