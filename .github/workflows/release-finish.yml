@@ -15,11 +15,11 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v3
+
       - name: Remove the workflow label
         if: always()
         run: gh pr edit ${{ github.event.number }} --remove-label bot/release/finish
-
-      - uses: actions/checkout@v3
 
       - name: Read the version.go file
         id: version
