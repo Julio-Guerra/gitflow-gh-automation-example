@@ -19,4 +19,4 @@ fi;
 parse_version_file
 current=${version[version]}
 echo Replacing $current into $next in $version_file_path
-sed "s#$current#$next#g" $version_file_path
+sed -i "s#$current#$next#g" $version_file_path
