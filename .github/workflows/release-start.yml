@@ -7,6 +7,10 @@ on:
         description: 'Version of the release'
         required: true
 
+env:
+  PR_TEMPLATE_PATH: .github/PULL_REQUEST_TEMPLATE/release.md
+  VERSION: ${{github.event.inputs.version}}
+
 jobs:
   create_branch_and_pr:
     name: Create a release pull request against v1
@@ -27,8 +31,13 @@ jobs:
       - name: Create the release-${{github.event.inputs.version}} branch
         run: |
           git checkout main
-          git checkout -b release-${{github.event.inputs.version}}
-          git push -u origin release-${{github.event.inputs.version}}
+          git checkout -b release-$VERSION
+          git push -u origin release-$VERSION
 
       - name: Open a pull request from release-${{github.event.inputs.version}} to v1
-          gh pr create -t "Release ${{github.event.inputs.version}}" -b "" -B v1
+        run: |
+          gh pr create -t "Release $VERSION" -b "" -B v1 -F $GITHUB_WORKSPACE/$PR_TEMPLATE_PATH -m $VERSION -a $GITHUB_ACTOR
+
+      - name: Create a new release draft
+        run: |
+          gh release create $VERSION -t $VERSION -d --generate-notes --target v1
