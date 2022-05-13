@@ -48,12 +48,12 @@ jobs:
           git add --all
           git commit -m "update version file to $VERSION"
 
-      - name: Merge the release branch into the dev branch
+      - name: Merge the release branch into the main branch
         run: |
           git checkout main
           git merge --no-edit -m "Merge branch $GITHUB_HEAD_REF into main #${{ github.event.number }}" --no-ff "$GITHUB_HEAD_REF"
 
-      - name: Bump the version.go file in the dev branch main to ${{ steps.version.outputs.next_minor }}
+      - name: Bump the version.go file in the main branch to ${{ steps.version.outputs.next_minor }}
         env:
           NEXT_VERSION: ${{ steps.version.outputs.next_minor }}
         run: |
@@ -61,7 +61,7 @@ jobs:
           git add --all
           git commit -m "update version file to $NEXT_VERSION"
 
-      - name: Merge the PR into the stable branch v1
+      - name: Merge the PR into the v1 branch
         run: |
           git checkout v1
           git merge --no-edit -m "Merge branch $GITHUB_HEAD_REF into v1 #${{ github.event.number }}" --no-ff "$GITHUB_HEAD_REF"
@@ -69,15 +69,22 @@ jobs:
       - name: Create the git tag ${{ steps.version.outputs.current_without_rc_suffix }}
         run: git tag ${{ steps.version.outputs.current_without_rc_suffix }}
 
-      - name: Push the branches and tag
+      # Push the branches and delete the release branch
+      # Note the order is intentional here in order to avoid pushing the tag or the release if the main branch merge
+      # fails
+      - name: Push the main branch
         run: |
-          # Push the branches and delete the release branch
-          # Note the order is intentional here in order to avoid pushing the tag or the release in the main branch merge
-          # fails
           git push origin main # can fail if a new commit happened upstream meanwhile - the workflow should be re-executed
+
+      - name: Push the v1 branch
+        run: |
           git push origin v1 # should never fail because the v1 is used by one release at a time
-          git push origin ":$GITHUB_HEAD_REF" # remove the branch
-          git push --tags origin # push the tag 
+
+      - name: Remove the release branch
+        run: git push origin ":$GITHUB_HEAD_REF"
+
+      - name: Push the tag
+        run: git push --tags origin
 
       - name: Add a PR comment
         if: success()
