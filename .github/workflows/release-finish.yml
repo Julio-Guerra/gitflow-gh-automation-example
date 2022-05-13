@@ -41,7 +41,7 @@ jobs:
           # the non-release-candidate tag, either there was no release candidate and this step will exit without error.
           git checkout "$GITHUB_HEAD_REF"
           _tools/release/update-version-file.sh $VERSION
-          if git diff-index --exit-code HEAD --; then
+          if _tools/release/has-git-diff.sh; then
             echo "No change to commit"
             exit 0 # no diff: the version file is unchanged and already good
           fi
