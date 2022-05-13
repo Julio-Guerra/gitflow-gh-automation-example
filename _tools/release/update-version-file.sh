@@ -10,7 +10,7 @@ source _tools/release/lib.sh
 # Validate the given argument is a correct version number
 next="$1"
 parse_version "$next"
-if [[ "$next" = "" || "${version[version]}" != "$next" ]]; then
+if [[ "$next" = "" ]] || [[ "${version[version]}" != "$next" ]]; then
   echo "error: unexpected argument value \`$next\`: a valid version string is expected"
   exit 1
 fi;
