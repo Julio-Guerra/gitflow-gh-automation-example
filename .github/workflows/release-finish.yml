@@ -1,4 +1,4 @@
-name: Bot / Merge the release branch into main and v1
+name: Release / Finish the release (bot)
 
 on:
   pull_request:

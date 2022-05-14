@@ -1,4 +1,4 @@
-name: Publish a new release candidate
+name: Release / Publish a new release candidate (bot)
 
 on:
   pull_request:
