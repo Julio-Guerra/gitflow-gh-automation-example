@@ -1,4 +1,4 @@
-name: Merge the release branch
+name: Bot / Merge the release branch into main and v1
 
 on:
   pull_request:
@@ -7,13 +7,14 @@ on:
     types:
       - labeled
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
-  merge_and_tag:
+  merge:
     name: Merge the release branch
     if: github.event.label.name == 'bot/release/finish'
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     steps:
       - name: Remove the workflow label
         if: always()
@@ -83,13 +84,9 @@ jobs:
       - name: Remove the release branch
         run: git push origin ":$GITHUB_HEAD_REF"
 
-      - name: Push the git tag ${{ steps.version.outputs.current_without_rc_suffix }}
-        run: git push --tags origin
-
       - name: Add a PR comment
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: Congratulations, the release branch was successfully merged
-          and tagged with ${{ steps.version.outputs.current_without_rc_suffix }}.
+          :tada: Congratulations, the release branch was successfully merged and tagged with ${{ steps.version.outputs.current_without_rc_suffix }}.
           EOF
