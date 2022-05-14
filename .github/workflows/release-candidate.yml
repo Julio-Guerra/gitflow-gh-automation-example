@@ -1,4 +1,4 @@
-name: Publish a new release candidate
+name: Release / Publish a new release candidate (bot)
 
 on:
   pull_request:
@@ -17,52 +17,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get the release version tag
-        id: get_version
-        run: |
-          # Get the version tag out of the release branch name
-          _tools/release/parse-version.sh "$(cat version)"
+      - name: Remove the workflow label
+        if: always()
+        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/publish-new-rc
 
-      - id: bump_version
-        run: |
-          major=${{ steps.get_version.outputs.major }}
-          minor=${{ steps.get_version.outputs.minor }}
-          patch=${{ steps.get_version.outputs.patch }}
-          rc=$(("${{ steps.get_version.outputs.rc }}" + 1))
-          version=v$major.$minor.$patch-rc.$rc
-          echo $version > version
-          echo "::set-output name=version::$version"
+      - name: Read the version.go file
+        id: version
+        run: _tools/release/parse-version.sh
 
-      - name: Configure the git author and fetch the branch
+      - name: Configure git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          
-          # Fetch the tags, the PR, v1 and main branches
           git fetch --tags origin "$GITHUB_HEAD_REF"
 
-      - name: Update the version file
+      - name: Update the version.go file in the release branch to ${{ steps.version.outputs.next_rc }}
+        env:
+          VERSION: ${{ steps.version.outputs.next_rc }}
         run: |
           git checkout "$GITHUB_HEAD_REF"
-          git add version
-          git commit -m "release candidate ${{ steps.bump_version.outputs.version }}"
+          _tools/release/update-version-file.sh $VERSION
+          git add --all
+          git commit -m "update version to $VERSION"
 
-      - name: Create the git tag ${{ steps.bump_version.outputs.version }}
-        run: |
-          git tag -m "${{ steps.bump_version.outputs.version }} #${{ github.event.number }}" ${{ steps.bump_version.outputs.version }}
+      - name: Create the git tag ${{ steps.version.outputs.next_rc }}
+        env:
+          VERSION: ${{ steps.version.outputs.next_rc }}
+        run: git tag -m "$VERSION - PR \#${{ github.event.number }}" $VERSION
 
       - name: Push the branch and tag
-        run: |
-          # Push the tag and the release branch
-          git push --tags origin "$GITHUB_HEAD_REF"
+        run: git push --tags origin "$GITHUB_HEAD_REF"
 
       - name: Add a PR comment
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: The release candidate tag ${{ steps.bump_version.outputs.version }} has been successfully published.
+          :tada: The release candidate tag ${{ steps.version.outputs.next_rc }} has been successfully published.
           EOF
-
-      - name: Remove the workflow label
-        if: always()
-        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/publish-new-rc
