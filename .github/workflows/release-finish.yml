@@ -13,7 +13,7 @@ jobs:
     if: github.event.label.name == 'bot/release/finish'
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     steps:
       - name: Remove the workflow label
         if: always()
@@ -83,7 +83,7 @@ jobs:
       - name: Remove the release branch
         run: git push origin ":$GITHUB_HEAD_REF"
 
-      - name: Push the tag
+      - name: Push the git tag ${{ steps.version.outputs.current_without_rc_suffix }}
         run: git push --tags origin
 
       - name: Add a PR comment
