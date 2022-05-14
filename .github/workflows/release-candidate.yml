@@ -43,7 +43,7 @@ jobs:
       - name: Create the git tag ${{ steps.version.outputs.next_rc }}
         env:
           VERSION: ${{ steps.version.outputs.next_rc }}
-        run: git tag -m "$VERSION - PR #${{ github.event.number }}" $VERSION
+        run: git tag -m "$VERSION - PR \#${{ github.event.number }}" $VERSION
 
       - name: Push the branch and tag
         run: git push --tags origin "$GITHUB_HEAD_REF"
@@ -52,5 +52,5 @@ jobs:
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: The release candidate tag ${{ steps.bump_version.outputs.version }} has been successfully published.
+          :tada: The release candidate tag ${{ steps.version.outputs.next_rc }} has been successfully published.
           EOF
