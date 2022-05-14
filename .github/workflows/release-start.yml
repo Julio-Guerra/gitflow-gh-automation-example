@@ -18,12 +18,10 @@ jobs:
         id: version
         run: _tools/release/parse-version.sh
 
-      - name: Configure and fetch the branches
+      - name: Configure git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-          # Fetch the tags, the PR, v1 and main branches
           git fetch origin main
 
       - name: Create the release branch release-${{ steps.version.outputs.current }}
