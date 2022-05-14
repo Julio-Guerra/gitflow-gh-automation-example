@@ -36,8 +36,9 @@ jobs:
           VERSION: ${{ steps.version.outputs.next_rc }}
         run: |
           git checkout "$GITHUB_HEAD_REF"
+          _tools/release/update-version-file.sh $VERSION
           git add --all
-          git commit -m "release candidate $VERSION"
+          git commit -m "update version to $VERSION"
 
       - name: Create the git tag ${{ steps.version.outputs.next_rc }}
         env:

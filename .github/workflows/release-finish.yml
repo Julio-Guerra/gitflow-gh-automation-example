@@ -45,7 +45,7 @@ jobs:
             exit 0 # no diff: the version file is unchanged and already good
           fi
           git add --all
-          git commit -m "update version file to $VERSION"
+          git commit -m "update version to $VERSION"
 
       - name: Merge the release branch into the main branch
         run: |
@@ -58,7 +58,7 @@ jobs:
         run: |
           _tools/release/update-version-file.sh $NEXT_VERSION
           git add --all
-          git commit -m "update version file to $NEXT_VERSION"
+          git commit -m "update version to $NEXT_VERSION"
 
       - name: Merge the PR into the v1 branch
         run: |
