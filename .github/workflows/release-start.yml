@@ -49,7 +49,8 @@ jobs:
         env:
           NEXT_VERSION: ${{ steps.version.outputs.next_minor }}
         run: |
-          gh api \
-            --method POST -f title="$NEXT_VERSION" \
-           -f state='open' \
-           -f description="Tracking milestone for version $NEXT_VERSION"
+          gh api /repos/$GITHUB_REPOSITORY/milestones \
+            --method POST \
+            -f title="$NEXT_VERSION" \
+            -f state='open' \
+            -f description="Tracking milestone for version $NEXT_VERSION"
