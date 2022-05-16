@@ -37,7 +37,7 @@ jobs:
         run: |
           url=$(gh release create $VERSION --title $VERSION --draft --generate-notes --target v1)
           echo $url
-          echo "::set-output name=current_without_rc_suffix::$current_without_rc_suffix"
+          echo "::set-output name=url::$url"
 
       - name: Open the release pull request
         env:
