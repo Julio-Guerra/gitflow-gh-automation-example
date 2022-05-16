@@ -44,9 +44,10 @@ jobs:
           VERSION: ${{ steps.version.outputs.current }}
           RELEASE_NOTE_URL: ${{ steps.release_note.outputs.url }}
         run: |
+          _tools/release/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL" | \
           gh pr create \
             --title "Release $VERSION" \
             --base v1 \
             --milestone $VERSION \
             --assignee $GITHUB_ACTOR \
-            --body-file - < _tools/release/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL"
+            --body-file -
