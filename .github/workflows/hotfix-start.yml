@@ -1,0 +1,10 @@
+name: Release / Start a new hotfix release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    uses: ./.github/workflows/release-start.yml
+    with:
+      hotfix: true

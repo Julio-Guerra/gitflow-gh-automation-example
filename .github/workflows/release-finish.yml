@@ -86,5 +86,6 @@ jobs:
         if: success()
         run: |
           gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: Congratulations, the release branch was successfully merged and tagged with ${{ steps.version.outputs.current_without_rc_suffix }}.
+          :tada: Congratulations, the release branch was successfully merged.
+          Please review everything and publish your release draft.
           EOF

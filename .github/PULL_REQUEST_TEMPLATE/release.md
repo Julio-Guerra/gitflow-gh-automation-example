@@ -1,26 +1,27 @@
 ## Checklist
 
-- [ ] Draft [the release note](https://github.com/DataDog/dd-trace-go/releases/new).
+### Release Note
+
+- [ ] Review [the release note draft]($RELEASE_NOTE_URL).
 - [ ] Ask for its review to the APM, ASM and Profiling team leads involved in the release changes on the `#guild-dd-go`
   slack channel.
 
+### Release Candidate
+
 - Deploy a release candidate:
-    - Create a release candidate version on this release branch:
-        - [ ] Bump and commit the release candidate version string in `/internal/version/version.go` (eg. `v1.2.3-rc.4`)
-        - [ ] Tag the bump commit with the release candidate version (eg. `git tag v1.2.3-rc.4`)
-        - [ ] Push the tag and commit (eg. `git push --tags origin release-v1.2.3`)
+    - Create a release candidate version on this release branch.
     - Deploy some Datadog services to staging:
         - [ ] Give a heads-up on the channel `#staging-headsup` that you are starting the deployment.
         - [ ] Create a draft pull request on dd-go upgrading dd-trace-go to the release candidate tag:
           ```console
           dd-go/$ git checkout prod
           dd-go/$ git pull
-          dd-go/$ git checkout -b dd-trace-go-v1.2.3
-          dd-go/$ go get -u -v gopkg.in/DataDog/dd-trace-go.v1@v1.2.3-rc.4
+          dd-go/$ git checkout -b dd-trace-go-$RELEASE_VERSION
+          dd-go/$ go get -u -v gopkg.in/DataDog/dd-trace-go.v1@$RELEASE_VERSION-rc.4
           dd-go/$ go mod tidy
           dd-go/$ git add go.mod go.sum
-          dd-go/$ git commit -m '[go.mod] upgrade dd-trace-go to v1.2.3-rc.4'
-          dd-go/$ git push -u origin dd-trace-go-v1.2.3
+          dd-go/$ git commit -m '[go.mod] upgrade dd-trace-go to $RELEASE_VERSION-rc.4'
+          dd-go/$ git push -u origin dd-trace-go-$RELEASE_VERSION
           ```
         - [ ] Deploy some services to staging:
           ```console
