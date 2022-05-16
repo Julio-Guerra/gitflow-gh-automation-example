@@ -1,17 +1,30 @@
 name: Release / Start a new release
 
 on:
+  workflow_call:
+    inputs:
+      hotfix:
+        description: Whether the release being started is a hotfix. If not, it is considered a minor version release.
+        required: true
+        type: boolean
+        default: false
+
   workflow_dispatch:
 
 env:
-  PR_TEMPLATE_PATH: .github/PULL_REQUEST_TEMPLATE/release.md
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  RELEASE_KIND: ${{ inputs.hotfix && 'hotfix' || 'release' }}
 
 jobs:
   start:
     name: Create a release pull request against v1
     runs-on: ubuntu-latest
+    env:
+      PR_TEMPLATE_PATH: .github/PULL_REQUEST_TEMPLATE/$RELEASE_KIND.md
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - run: |
+          echo $RELEASE_KIND
+          echo ${{ inputs.hotfix }}
       - uses: actions/checkout@v3
 
       - name: Read the version.go file
