@@ -1,25 +1,15 @@
 name: Release / Start a new release
 
 on:
-  workflow_call:
-    inputs:
-      hotfix:
-        description: Whether the release being started is a hotfix. If not, it is considered a minor version release.
-        required: true
-        type: boolean
-        default: false
-
   workflow_dispatch:
 
 env:
-  RELEASE_KIND: ${{ inputs.hotfix && 'hotfix' || 'release' }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   start:
     name: Create a release pull request against v1
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
 
@@ -40,25 +30,23 @@ jobs:
           git checkout -b release-$VERSION origin/main
           git push -u origin release-$VERSION
 
-      - name: Update the version.go file version to ${{ steps.version.outputs.next_patch }} (hotfix release only)
-        env:
-          VERSION: ${{ steps.version.outputs.next_patch }}
-        run: |
-          _tools/release/update-version-file.sh $VERSION
-          git add --all
-          git commit -m "update version to $NEXT_VERSION"
-
       - name: Create the release note draft
-        id: create_release_note
+        id: release_note
         env:
           VERSION: ${{ steps.version.outputs.current }}
         run: |
           url=$(gh release create $VERSION --title $VERSION --draft --generate-notes --target v1)
-          echo "::set-output name=url::$url"
+          echo $url
+          echo "::set-output name=current_without_rc_suffix::$current_without_rc_suffix"
 
       - name: Open the release pull request
         env:
           VERSION: ${{ steps.version.outputs.current }}
+          RELEASE_NOTE_URL: ${{ steps.release_note.outputs.url }}
         run: |
-          # TODO: inject the release-note url in the body
-          gh pr create --title "Release $VERSION" --base v1 --body-file $GITHUB_WORKSPACE/.github/PULL_REQUEST_TEMPLATE/$RELEASE_KIND.md --milestone $VERSION --assignee $GITHUB_ACTOR
+          gh pr create \
+            --title "Release $VERSION" \
+            --base v1 \
+            --milestone $VERSION \
+            --assignee $GITHUB_ACTOR \
+            --body-file - < _tools/release/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL"
