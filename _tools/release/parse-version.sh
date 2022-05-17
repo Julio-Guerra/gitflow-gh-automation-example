@@ -27,7 +27,7 @@ minor=${version[minor]}
 patch=${version[patch]}
 rc=${version[rc]}
 
-next_minor="v$major.$(( $minor + 1 )).$patch"
+next_minor="v$major.$(( $minor + 1 )).0"
 next_patch="v$major.$minor.$(( $patch + 1 ))"
 next_rc="v$major.$minor.$patch-rc.$(( $rc + 1 ))"
 current_without_rc_suffix="v$major.$minor.$patch"
