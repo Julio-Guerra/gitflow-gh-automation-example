@@ -42,9 +42,10 @@ jobs:
       - name: Open the release pull request
         env:
           VERSION: ${{ steps.version.outputs.current }}
+          NEXT_MINOR_VERSION: ${{ steps.version.outputs.next_minor }}
           RELEASE_NOTE_URL: ${{ steps.release_note.outputs.url }}
         run: |
-          _tools/release/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL" | \
+          _tools/release/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL" "$NEXT_MINOR_VERSION" | \
           gh pr create \
             --title "Release $VERSION" \
             --base v1 \
