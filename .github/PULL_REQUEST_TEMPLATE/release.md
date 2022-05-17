@@ -48,8 +48,7 @@
 - Let the release candidate run on staging and rel-env for at least 24 hours and review all the dashboards, especially:
   - [ ] Check the memory usage trend of rel-env which should be flat over time on the [Go rel-env dashboard].
   - [ ] Check de deployment tab of some deployed staging services to see if there was any negative impact on the
-    service latency and memory usage (
-    eg. https://ddstaging.datadoghq.com/apm/services/trace-edge/operations/http.request/deployments).
+    service latency and memory usage (eg. https://ddstaging.datadoghq.com/apm/services/trace-edge/operations/http.request/deployments).
   - [ ] Check through the [Go tracer dashboard] to look for any anomalies such as high memory or cpu use, increased
     number of dropped traces, increase in tracer errors.
 
@@ -58,20 +57,13 @@
 
 ### Finishing the release
 
-If everything went well, you are good to finish the release:
-
 - [ ] Use the pull request label `bot/release/merge` in order to automatically merge the release branch into the `main`
   and `v1` branches, and update the version file of the `main` branch to the next minor version.
-
 - [ ] Publish the git tag `$RELEASE_VERSION` by publishing [the $RELEASE_VERSION release note draft]($RELEASE_NOTE_URL).
-
 - [ ] Finish updating dd-go's `go.mod` file now to the final `$RELEASE_VERSION` tag and merge your pull request.
-
 - [ ] Give a heads-up on the slack channels `#go` and `#guild-dd-go` about the now released `$RELEASE_VERSION` and
  `dd-go` update.
-
 - [ ] [Create the github milestone](https://github.com/DataDog/dd-trace-go/milestones/new) for the next version `$NEXT_MINOR_RELEASE_VERSION`.
-
 - [ ] Close the now released milestone and move its still opened PRs and issues to `Triage` or the new milestone `$NEXT_MINOR_RELEASE_VERSION`.
 
 [Go tracer dashboard]: https://ddstaging.datadoghq.com/dashboard/r92-2p7-shv/go-tracer
