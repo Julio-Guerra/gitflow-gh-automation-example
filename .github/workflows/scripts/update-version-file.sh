@@ -5,7 +5,7 @@
 #
 
 set -e
-source _tools/release/lib.sh
+source .github/workflows/scripts/lib.sh
 
 # Validate the given argument is a correct version number
 next="$1"
