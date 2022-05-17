@@ -24,7 +24,7 @@ jobs:
 
       - name: Read the version.go file
         id: version
-        run: _tools/release/parse-version.sh
+        run: .github/workflows/scripts/parse-version.sh
 
       - name: Configure git
         run: |
@@ -39,8 +39,8 @@ jobs:
           # Two possible cases: either version.go contains a release candidate version and it will be updated back to
           # the non-release-candidate tag, either there was no release candidate and this step will exit without error.
           git checkout "$GITHUB_HEAD_REF"
-          _tools/release/update-version-file.sh $VERSION
-          if _tools/release/has-git-diff.sh; then
+          .github/workflows/scripts/update-version-file.sh $VERSION
+          if .github/workflows/scripts/has-git-diff.sh; then
             echo "No change to commit"
             exit 0 # no diff: the version file is unchanged and already good
           fi
@@ -56,7 +56,7 @@ jobs:
         env:
           NEXT_VERSION: ${{ steps.version.outputs.next_minor }}
         run: |
-          _tools/release/update-version-file.sh $NEXT_VERSION
+          .github/workflows/scripts/update-version-file.sh $NEXT_VERSION
           git add --all
           git commit -m "update version to $NEXT_VERSION"
 

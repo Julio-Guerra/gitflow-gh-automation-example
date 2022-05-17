@@ -13,7 +13,7 @@
 #
 
 set -e
-source _tools/release/lib.sh
+source .github/workflows/scripts/lib.sh
 
 str="$1"
 if [[ -z "$str" ]]; then

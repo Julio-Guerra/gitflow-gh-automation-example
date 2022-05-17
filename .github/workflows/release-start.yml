@@ -15,7 +15,7 @@ jobs:
 
       - name: Read the version.go file
         id: version
-        run: _tools/release/parse-version.sh
+        run: .github/workflows/scripts/parse-version.sh
 
       - name: Configure git
         run: |
@@ -45,7 +45,7 @@ jobs:
           NEXT_MINOR_VERSION: ${{ steps.version.outputs.next_minor }}
           RELEASE_NOTE_URL: ${{ steps.release_note.outputs.url }}
         run: |
-          body=$(_tools/release/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL" "$NEXT_MINOR_VERSION")
+          body=$(.github/workflows/scripts/render-pr-template.sh "$VERSION" "$RELEASE_NOTE_URL" "$NEXT_MINOR_VERSION")
           gh pr create \
             --title "Release $VERSION" \
             --base v1 \

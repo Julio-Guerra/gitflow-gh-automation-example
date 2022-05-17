@@ -23,7 +23,7 @@ jobs:
 
       - name: Read the version.go file
         id: version
-        run: _tools/release/parse-version.sh
+        run: .github/workflows/scripts/parse-version.sh
 
       - name: Configure git
         run: |
@@ -36,7 +36,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.next_rc }}
         run: |
           git checkout "$GITHUB_HEAD_REF"
-          _tools/release/update-version-file.sh $VERSION
+          .github/workflows/scripts/update-version-file.sh $VERSION
           git add --all
           git commit -m "update version to $VERSION"
 
