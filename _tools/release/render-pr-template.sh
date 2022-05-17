@@ -4,13 +4,13 @@
 # This script renders the release template with the given template variables:
 # render-pr-template.sh \
 #   <RELEASE_VERSION> \
-#   <RELEASE_NOTE_URL>
+#   <RELEASE_NOTE_URL> \
+#   <NEXT_MINOR_RELEASE_VERSION>
 #
 
 set -e
 
-
-if [[ $# -ne 2 ]]; then
+if [[ $# -ne 3 ]]; then
   echo unexpected number of arguments
   exit 1
 fi
