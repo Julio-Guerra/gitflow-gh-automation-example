@@ -61,4 +61,4 @@ jobs:
             --method POST \
             -f title="$NEXT_VERSION" \
             -f state='open' \
-            -f description="Tracking milestone for version $NEXT_VERSION"
+            -f description="Tracking milestone for version $NEXT_VERSION" || true # ignore if already exists
