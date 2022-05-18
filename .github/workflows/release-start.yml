@@ -52,3 +52,13 @@ jobs:
             --milestone $VERSION \
             --assignee $GITHUB_ACTOR \
             --body "$body"
+
+      - name: Create the next release GitHub milestone ${{ steps.version.outputs.next_minor }}
+        env:
+          NEXT_VERSION: ${{ steps.version.outputs.next_minor }}
+        run: |
+          gh api /repos/$GITHUB_REPOSITORY/milestones \
+            --method POST \
+            -f title="$NEXT_VERSION" \
+            -f state='open' \
+            -f description="Tracking milestone for version $NEXT_VERSION" || true # ignore if already exists
