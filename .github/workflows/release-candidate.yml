@@ -1,25 +1,17 @@
 name: Release / Publish a new release candidate (bot)
 
 on:
-  pull_request:
-    branches:
-      - v1
-    types:
-      - labeled
+  workflow_dispatch:
 
 jobs:
   bump_rc_and_tag:
     name: Create and publish a new release candidate version
-    if: github.event.label.name == 'bot/release/publish-new-rc'
+    if: github.ref =~ 'refs/head/v[0-9]+\.[0-9]+\.x'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-
-      - name: Remove the workflow label
-        if: always()
-        run: gh pr edit ${{ github.event.number }} --remove-label bot/release/publish-new-rc
 
       - name: Read the version.go file
         id: version
@@ -47,10 +39,3 @@ jobs:
 
       - name: Push the branch and tag
         run: git push --tags origin "$GITHUB_HEAD_REF"
-
-      - name: Add a PR comment
-        if: success()
-        run: |
-          gh pr comment ${{ github.event.number }} -F - <<EOF
-          :tada: The release candidate tag ${{ steps.version.outputs.next_rc }} has been successfully published.
-          EOF
