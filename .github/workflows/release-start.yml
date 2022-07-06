@@ -27,4 +27,5 @@ jobs:
         env:
           BRANCH: release-${{ steps.version.outputs.current_without_patch }}
         run: |
-          [[ ! "${GITHUB_REF##*/}" =~ release-v[0-9]+\.[0-9]+\.x ]] && exit 1
+          [[ "${GITHUB_REF##*/}" =~ release-v[0-9]+\.[0-9]+\.x ]]
+          echo test
